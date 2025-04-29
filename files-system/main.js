@@ -1,6 +1,6 @@
 const fs = require('fs/promises');
 const path = require('path');
-console.log(process.cwd());
+
 (async () => {
     const commandFile = 'command.txt'
     const directory = __dirname
