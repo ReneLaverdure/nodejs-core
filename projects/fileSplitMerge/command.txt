@@ -1,1 +1,1 @@
-hfdskladsfljkfew
+split file data.csv
