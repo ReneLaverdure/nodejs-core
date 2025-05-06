@@ -89,8 +89,8 @@ const readCVS = (data) => {
         }
     }
 
-    const readCommandFile = async (path) => {
-        const file = await openFile(path)
+    const readCommandFile = async (filePath) => {
+        const file = await openFile(filePath)
 
         if (file.includes(READ_FILE)) {
             const filePath = file.substring(READ_FILE.length + 1)
@@ -99,6 +99,13 @@ const readCVS = (data) => {
         if (file.includes(SPLIT_FILE)) {
             const filePath = file.substring(SPLIT_FILE.length + 1)
             splitFile(filePath)
+        }
+        if (file.includes(MERGE_FILE)) {
+            const filePath = file.substring(MERGE_FILE.length + 1)
+            const fileName = path.parse(filePath).name
+            const dirPath = path.join(__dirname, fileName)
+
+            mergeFile(dirPath, 'newData.csv')
         }
     }
 
@@ -111,7 +118,6 @@ const readCVS = (data) => {
 
     const splitFile = async (filePath, div = 3) => {
         console.log('spliting file...')
-
         filePath = path.join(__dirname, filePath).trim()
         const fileName = path.parse(filePath).name
         const dirPath = `${__dirname}/${fileName}`
@@ -121,7 +127,6 @@ const readCVS = (data) => {
         try {
             const size = (await fileHandler.stat()).size
             const split = Math.ceil(size / div)
-            console.log('file size: ', size, split)
             const fullBuff = Buffer.alloc(split)
             const length = fullBuff.byteLength
             let offset = 0
@@ -138,6 +143,31 @@ const readCVS = (data) => {
             console.log(e)
         } finally {
             fileHandler.close()
+        }
+    }
+
+    const mergeFile = async (dirPath, newFileName) => {
+
+        try {
+            const dir = await fs.readdir(dirPath)
+
+
+            for (const dirent of dir) {
+                const filePath = path.join(dirPath, dirent)
+
+                const fileHandler = await fs.open(filePath)
+                const size = (await fileHandler.stat()).size
+                const buff = Buffer.alloc(size)
+                const length = buff.byteLength
+
+                await fileHandler.read(buff, 0, length, 0)
+                const content = buff.toString('utf8')
+                await fs.appendFile(`${dirPath}/${newFileName}`, content)
+            }
+
+        } catch (e) {
+            console.log(e)
+
         }
     }
 
