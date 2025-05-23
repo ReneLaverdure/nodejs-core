@@ -19,12 +19,12 @@ const streams = require('stream/promises');
 //
 // }
 // main()
-async function main() {
+(async () => {
     console.time('writeMany')
     const fileHandler = await fs.open('data.txt', 'w')
     const stream = fileHandler.createWriteStream()
     let i = 0
-    const numberOfWrites = 1000
+    const numberOfWrites = 1000000
     const writeMany = () => {
         while (i <= numberOfWrites) {
             const buff = Buffer.from(` ${i} `, 'utf-8')
@@ -52,5 +52,5 @@ async function main() {
     })
 
 
-}
-main()
+})()
+
